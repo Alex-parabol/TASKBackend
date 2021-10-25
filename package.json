@@ -4,7 +4,8 @@
   "description": "MERN API para TASK APP",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node .",
+    "dev": "nodemon ."
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/Alex-parabol/TASKBackend/issues"
   },
-  "homepage": "https://github.com/Alex-parabol/TASKBackend#readme"
+  "homepage": "https://github.com/Alex-parabol/TASKBackend#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.12"
+  }
 }
