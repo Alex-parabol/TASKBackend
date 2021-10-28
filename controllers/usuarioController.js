@@ -1,57 +1,58 @@
-const Usuario = require('../models/Usuario')
-const bcryptjs = require('bcryptjs')
-const { validationResult } = require('express-validator')
-const jwt = require('jsonwebtoken')
-
+const Usuario = require('../models/Usuario');
+const bcryptjs = require('bcryptjs');
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 
 exports.crearUsuario = async (req, res) => {
-    //revisamos si hay errores en la validación
 
-    const errores = validationResult(req)
-    if(!errores.isEmpty()){
-        return res.status(400).json( { errores: errores.array()})
+    // revisar si hay errores
+    const errores = validationResult(req);
+    if( !errores.isEmpty() ) {
+        return res.status(400).json({errores: errores.array() })
     }
 
-    //extraemos email y password con destructuring
-    const { email, password } = req.body
+    // extraer email y password
+    const { email, password } = req.body;
+
+
     try {
-        //validamos que el usuario sea único
+        // Revisar que el usuario registrado sea unico
         let usuario = await Usuario.findOne({ email });
 
-        if(usuario){
-            return res.status(400).json({msg: 'El usuario ya está registrado'})
+        if(usuario) {
+            return res.status(400).json({ msg: 'El usuario ya existe' });
         }
-        //crea el nuevo usuario
+
+        // crea el nuevo usuario
         usuario = new Usuario(req.body);
 
-        // hasheamos el password con salt (generador de hash únicos, para passwords iguales) 
+        // Hashear el password
         const salt = await bcryptjs.genSalt(10);
-        usuario.password = await bcryptjs.hash(password, salt)
-        console.log(usuario)
+        usuario.password = await bcryptjs.hash(password, salt );
 
-        //guardamos usuario
+        // guardar usuario
+        await usuario.save();
 
-        await usuario.save()
-
-        //creamos con el payload y firmamos el JsonWebToken
-
+        // Crear y firmar el JWT
         const payload = {
             usuario: {
                 id: usuario.id
             }
         };
 
+        // firmar el JWT
         jwt.sign(payload, process.env.SECRETA, {
-            expiresIn:7200
-        }, (error, token)=> {
+            expiresIn: 3600 // 1 hora
+        }, (error, token) => {
             if(error) throw error;
-            //mensaje de confirmación de guardado
-            res.json({token : token})
-        })
 
-        
+            // Mensaje de confirmación
+            res.json({ token  });
+        });
+
+
     } catch (error) {
-        console.log(error)
-        res.status(400).send('hubo un error')
+        console.log(error);
+        res.status(400).send('Hubo un error');
     }
 }
