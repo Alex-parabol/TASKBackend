@@ -52,7 +52,7 @@ exports.autenticarUsuario = async (req, res) => {
 
 exports.usuarioAutenticado = async (req,res) => {
     try {
-        const usuario = await Usuario.findById((req.usuario.id));
+        const usuario = await Usuario.findById(req.usuario.id).select('-password');// .select() lo usamos para que no aparezca el password hasheado.
         res.json({usuario})
     } catch (error) {
         console.log(error);
